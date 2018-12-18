@@ -5,13 +5,18 @@ from flask import request
 
 app = Flask(__name__)
 
-RSS_FEED = {'bbc': 'http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml',
+RSS_FEEDS = {'bbc': 'http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml',
             'abc': 'http://feeds.abcnews.com/abcnews/topstories',
             'cnn': 'http://rss.cnn.com/rss/edition.rss'}
 
 @app.route("/")
 def get_news():
-    feed = feedparser.parse(RSS_FEED[publication])
+    query = request.args.get("publication")
+    if not query or query.lower() not in RSS_FEEDS:
+        publication = "bbc"
+    else:
+        publication = query.lower()
+    feed = feedparser.parse(RSS_FEEDS[publication])
     return render_template("home.html", articles=feed['entries'])
 
 if __name__ == '__main__':
